@@ -1,0 +1,49 @@
+version: "3.9"
+
+services:
+  db:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_DB: aethercrm
+      POSTGRES_USER: aether
+      POSTGRES_PASSWORD: aether_secret
+    ports:
+      - "5432:5432"
+    volumes:
+      - aether_pg:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U aether -d aethercrm"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    environment:
+      SPRING_PROFILES_ACTIVE: prod
+      DATABASE_URL: jdbc:postgresql://db:5432/aethercrm
+      DATABASE_USERNAME: aether
+      DATABASE_PASSWORD: aether_secret
+      JWT_SECRET: change-me-in-production-use-at-least-256-bits-secret-key-here!!
+      CORS_ORIGINS: http://localhost:5173,http://localhost:3000,http://localhost
+      AI_PROVIDER: ${AI_PROVIDER:-mock}
+      OPENAI_API_KEY: ${OPENAI_API_KEY:-}
+    ports:
+      - "8080:8080"
+    depends_on:
+      db:
+        condition: service_healthy
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    ports:
+      - "5173:80"
+    depends_on:
+      - backend
+
+volumes:
+  aether_pg:
