@@ -7,6 +7,8 @@ const nav = [
   { to: '/accounts', label: 'Accounts' },
   { to: '/contacts', label: 'Contacts' },
   { to: '/pipeline', label: 'Pipeline' },
+  { to: '/activities', label: 'Activities' },
+  { to: '/support', label: 'Support' },
   { to: '/ai', label: 'AI Copilot' },
 ];
 
@@ -31,23 +33,34 @@ export default function Layout() {
             </div>
           </div>
         </div>
-        <nav className="flex-1 py-4 px-3 space-y-0.5">
+        <nav className="flex-1 py-4 px-3 space-y-0.5 overflow-y-auto">
           {nav.map((item) => (
-            <NavLink key={item.to} to={item.to} end={item.end}
+            <NavLink
+              key={item.to}
+              to={item.to}
+              end={item.end}
               className={({ isActive }) =>
                 `block rounded-lg px-3 py-2 text-sm font-medium transition-colors ${
                   isActive ? 'bg-indigo-600 text-white' : 'text-slate-300 hover:bg-slate-800 hover:text-white'
-                }`}>{item.label}</NavLink>
+                }`
+              }
+            >
+              {item.label}
+            </NavLink>
           ))}
         </nav>
         <div className="p-4 border-t border-slate-700">
           <div className="text-xs text-slate-400 mb-1">{user?.email}</div>
           <div className="text-sm font-medium text-white mb-2">{user?.displayName || user?.firstName}</div>
-          <button onClick={logout} className="text-xs text-slate-400 hover:text-white">Sign out</button>
+          <button onClick={logout} className="text-xs text-slate-400 hover:text-white">
+            Sign out
+          </button>
         </div>
       </aside>
       <main className="flex-1 overflow-auto">
-        <div className="p-6 max-w-7xl mx-auto"><Outlet /></div>
+        <div className="p-6 max-w-7xl mx-auto">
+          <Outlet />
+        </div>
       </main>
     </div>
   );

@@ -8,6 +8,8 @@ import LeadsPage from './pages/LeadsPage';
 import AccountsPage from './pages/AccountsPage';
 import ContactsPage from './pages/ContactsPage';
 import PipelinePage from './pages/PipelinePage';
+import ActivitiesPage from './pages/ActivitiesPage';
+import SupportPage from './pages/SupportPage';
 import AiPage from './pages/AiPage';
 
 function PrivateRoute({ children }: { children: React.ReactNode }) {
@@ -34,6 +36,8 @@ export default function App() {
           <Route path="accounts" element={<AccountsPage />} />
           <Route path="contacts" element={<ContactsPage />} />
           <Route path="pipeline" element={<PipelinePage />} />
+          <Route path="activities" element={<ActivitiesPage />} />
+          <Route path="support" element={<SupportPage />} />
           <Route path="ai" element={<AiPage />} />
         </Route>
         <Route path="*" element={<Navigate to="/" replace />} />

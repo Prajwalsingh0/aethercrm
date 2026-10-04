@@ -6,6 +6,8 @@ type Summary = {
   accounts: { total: number };
   contacts: { total: number };
   pipeline: { openDeals: number; openValue: number; weightedValue: number };
+  support?: { openTickets: number; totalTickets: number };
+  activity?: { openTasks: number };
 };
 
 export default function DashboardPage() {
@@ -13,7 +15,9 @@ export default function DashboardPage() {
   const [error, setError] = useState('');
 
   useEffect(() => {
-    api<Summary>('/api/v1/dashboard/summary').then(setData).catch((e) => setError(e.message));
+    api<Summary>('/api/v1/dashboard/summary')
+      .then(setData)
+      .catch((e) => setError(e.message));
   }, []);
 
   if (error) return <div className="text-red-600">{error}</div>;
@@ -23,14 +27,16 @@ export default function DashboardPage() {
     { label: 'Total leads', value: data.leads.total, sub: `${data.leads.new} new` },
     { label: 'Qualified', value: data.leads.qualified, sub: `${data.leads.converted} converted` },
     { label: 'Accounts', value: data.accounts.total, sub: `${data.contacts.total} contacts` },
-    { label: 'Open deals', value: data.pipeline.openDeals, sub: `Weighted ₹${Number(data.pipeline.weightedValue).toLocaleString()}` },
+    { label: 'Open deals', value: data.pipeline.openDeals, sub: `Weighted ₹${Number(data.pipeline.weightedValue || 0).toLocaleString()}` },
+    { label: 'Open tickets', value: data.support?.openTickets ?? 0, sub: `${data.support?.totalTickets ?? 0} total` },
+    { label: 'Open tasks', value: data.activity?.openTasks ?? 0, sub: 'Activities' },
   ];
 
   return (
     <div>
       <h1 className="text-2xl font-semibold text-slate-900 mb-1">Dashboard</h1>
       <p className="text-slate-500 text-sm mb-6">Live metrics from your organization</p>
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
         {cards.map((c) => (
           <div key={c.label} className="bg-white rounded-xl border border-slate-200 p-5 shadow-sm">
             <div className="text-sm text-slate-500 font-medium">{c.label}</div>
@@ -42,8 +48,9 @@ export default function DashboardPage() {
       <div className="mt-8 bg-white rounded-xl border border-slate-200 p-5 shadow-sm">
         <h2 className="font-semibold text-slate-900 mb-2">Pipeline value</h2>
         <p className="text-slate-600 text-sm">
-          Open value: <strong>₹{Number(data.pipeline.openValue).toLocaleString()}</strong>
-          {' · '}Weighted: <strong>₹{Number(data.pipeline.weightedValue).toLocaleString()}</strong>
+          Open value: <strong>₹{Number(data.pipeline.openValue || 0).toLocaleString()}</strong>
+          {' · '}
+          Weighted: <strong>₹{Number(data.pipeline.weightedValue || 0).toLocaleString()}</strong>
         </p>
       </div>
     </div>
