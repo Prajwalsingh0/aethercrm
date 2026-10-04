@@ -36,6 +36,18 @@ spring:
       write-dates-as-timestamps: false
     default-property-inclusion: non_null
 
+  mail:
+    host: ${MAIL_HOST:}
+    port: ${MAIL_PORT:587}
+    username: ${MAIL_USERNAME:}
+    password: ${MAIL_PASSWORD:}
+    properties:
+      mail:
+        smtp:
+          auth: ${MAIL_SMTP_AUTH:true}
+          starttls:
+            enable: ${MAIL_SMTP_STARTTLS:true}
+
 server:
   port: ${SERVER_PORT:8080}
   error:
@@ -58,6 +70,9 @@ aethercrm:
     refresh-token-expiry-days: ${JWT_REFRESH_EXPIRY:7}
   cors:
     allowed-origins: ${CORS_ORIGINS:http://localhost:5173,http://localhost:3000}
+  email:
+    from: ${MAIL_FROM:noreply@aethercrm.local}
+    enabled: ${MAIL_ENABLED:false}
   ai:
     provider: ${AI_PROVIDER:mock}
     openai:
@@ -80,6 +95,7 @@ logging:
     com.aethercrm: DEBUG
     org.springframework.security: INFO
 ---
+# Production profile (PostgreSQL)
 spring:
   config:
     activate:
