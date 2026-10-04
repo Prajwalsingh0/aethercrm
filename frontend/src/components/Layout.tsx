@@ -13,6 +13,7 @@ const nav = [
   { to: '/campaigns', label: 'Campaigns' },
   { to: '/knowledge', label: 'Knowledge' },
   { to: '/workflows', label: 'Workflows' },
+  { to: '/email', label: 'Email' },
   { to: '/ai', label: 'AI Copilot' },
 ];
 

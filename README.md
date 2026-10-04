@@ -2,7 +2,7 @@
 
 **Intelligent Customer Relationships, Elevated**
 
-Multi-tenant AI-native CRM: sales, support, marketing, knowledge, workflows, and an AI copilot.
+Multi-tenant AI-native CRM: sales, support, marketing, knowledge, workflows, email, and an AI copilot.
 
 ## Quick start (local H2)
 
@@ -21,11 +21,18 @@ cd frontend && npm install && npm run dev
 docker compose up --build
 ```
 
-Live AI (optional):
+## Email (SMTP)
+
+By default emails are **logged only** (stored in CRM + activity timeline).
+
+To send real mail:
 ```bash
-export AI_PROVIDER=openai
-export OPENAI_API_KEY=sk-...
-docker compose up --build
+export MAIL_ENABLED=true
+export MAIL_HOST=smtp.example.com
+export MAIL_PORT=587
+export MAIL_USERNAME=you@example.com
+export MAIL_PASSWORD=secret
+export MAIL_FROM=crm@yourcompany.com
 ```
 
 ## Features
@@ -39,9 +46,10 @@ docker compose up --build
 - Marketing campaigns
 - Knowledge base articles
 - Workflow definitions
+- Email (SMTP send + log-only mode, activity link)
 - AI Copilot (mock + OpenAI-compatible)
-- Flyway V1–V5, Docker Compose
+- Flyway V1–V6, Docker Compose
 
 ## Stack
 
-React + TypeScript + Vite + Tailwind · Java 17 · Spring Boot 3.3 · JWT · H2/Postgres · Flyway
+React + TypeScript + Vite + Tailwind · Java 17 · Spring Boot 3.3 · JWT · H2/Postgres · Flyway · JavaMail
