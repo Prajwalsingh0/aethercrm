@@ -1,0 +1,24 @@
+package com.aethercrm.notification;
+
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
+
+import java.util.Optional;
+import java.util.UUID;
+
+public interface NotificationRepository extends JpaRepository<Notification, UUID> {
+
+    Page<Notification> findByUserIdAndOrganizationIdOrderByCreatedAtDesc(UUID userId, UUID organizationId, Pageable pageable);
+
+    long countByUserIdAndOrganizationIdAndIsReadFalse(UUID userId, UUID organizationId);
+
+    Optional<Notification> findByIdAndUserId(UUID id, UUID userId);
+
+    @Modifying
+    @Query("UPDATE Notification n SET n.isRead = true WHERE n.userId = :userId AND n.organizationId = :orgId AND n.isRead = false")
+    int markAllRead(@Param("userId") UUID userId, @Param("orgId") UUID orgId);
+}
