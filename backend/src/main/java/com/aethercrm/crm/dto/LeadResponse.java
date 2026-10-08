@@ -22,6 +22,7 @@ public class LeadResponse {
     private String source;
     private String status;
     private Integer score;
+    private String scoreFactorsJson;
     private UUID ownerId;
     private String description;
     private String address;
@@ -47,6 +48,7 @@ public class LeadResponse {
                 .source(l.getSource())
                 .status(l.getStatus())
                 .score(l.getScore())
+                .scoreFactorsJson(l.getScoreFactorsJson())
                 .ownerId(l.getOwnerId())
                 .description(l.getDescription())
                 .address(l.getAddress())

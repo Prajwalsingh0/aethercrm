@@ -6,6 +6,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -17,7 +18,7 @@ public interface LeadRepository extends JpaRepository<Lead, UUID> {
            "AND (:q IS NULL OR LOWER(l.firstName) LIKE LOWER(CONCAT('%',:q,'%')) " +
            "OR LOWER(l.lastName) LIKE LOWER(CONCAT('%',:q,'%')) " +
            "OR LOWER(l.email) LIKE LOWER(CONCAT('%',:q,'%')) " +
-           "OR LOWER(l.company) LIKE LOWER(CONCAT('%',:q,'%')))")
+           "OR LOWER(l.company) LIKE LOWER(CONCAT('%',:q,'%'))")
     Page<Lead> search(@Param("orgId") UUID orgId,
                       @Param("status") String status,
                       @Param("ownerId") UUID ownerId,
@@ -29,4 +30,8 @@ public interface LeadRepository extends JpaRepository<Lead, UUID> {
     long countByOrganizationIdAndDeletedAtIsNull(UUID organizationId);
 
     long countByOrganizationIdAndStatusAndDeletedAtIsNull(UUID organizationId, String status);
+
+    List<Lead> findByOrganizationIdAndStatusAndDeletedAtIsNull(UUID organizationId, String status);
+
+    List<Lead> findByOrganizationIdAndDeletedAtIsNullOrderByCreatedAtDesc(UUID organizationId);
 }

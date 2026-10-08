@@ -67,4 +67,9 @@ public class LeadController {
     public ResponseEntity<LeadResponse> convert(@PathVariable UUID id) {
         return ResponseEntity.ok(leadService.convert(id));
     }
+
+    @PostMapping("/{id}/rescore")
+    public ResponseEntity<LeadResponse> rescore(@PathVariable UUID id) {
+        return ResponseEntity.ok(leadService.rescore(id));
+    }
 }
