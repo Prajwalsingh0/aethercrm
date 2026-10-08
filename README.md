@@ -1,6 +1,6 @@
 # AetherCRM
 
-**Intelligent Customer Relationships, Elevated**
+**Intelligent Customer Relationships, Elevated** · **v1 complete**
 
 Multi-tenant AI-native CRM: sales, support, marketing, knowledge, workflows, email, audit, and an **AI Command Center** that can execute actions.
 
@@ -12,6 +12,8 @@ Multi-tenant AI-native CRM: sales, support, marketing, knowledge, workflows, ema
 - **Tenant audit trail** — who changed what, including AI actions
 - **INR-native defaults** — currency and locale oriented for India / MSME demos
 - **Multi-tenant JWT isolation** — real SaaS tenancy, not a single-user demo
+
+See **[DEMO.md](DEMO.md)** for a 5-minute walkthrough.
 
 ## Quick start (local H2)
 
@@ -65,3 +67,7 @@ export MAIL_FROM=crm@yourcompany.com
 ## Stack
 
 React + TypeScript + Vite + Tailwind · Java 17 · Spring Boot 3.3 · JWT · H2/Postgres · Flyway · JavaMail
+
+## License
+
+MIT (or your choice)
