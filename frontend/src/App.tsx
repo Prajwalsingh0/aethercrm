@@ -15,6 +15,7 @@ import CampaignsPage from './pages/CampaignsPage';
 import KnowledgePage from './pages/KnowledgePage';
 import WorkflowsPage from './pages/WorkflowsPage';
 import EmailPage from './pages/EmailPage';
+import AuditPage from './pages/AuditPage';
 import AiPage from './pages/AiPage';
 
 function PrivateRoute({ children }: { children: React.ReactNode }) {
@@ -41,6 +42,7 @@ export default function App() {
           <Route path="knowledge" element={<KnowledgePage />} />
           <Route path="workflows" element={<WorkflowsPage />} />
           <Route path="email" element={<EmailPage />} />
+          <Route path="audit" element={<AuditPage />} />
           <Route path="ai" element={<AiPage />} />
         </Route>
         <Route path="*" element={<Navigate to="/" replace />} />

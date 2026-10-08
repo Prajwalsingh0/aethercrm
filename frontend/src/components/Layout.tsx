@@ -14,7 +14,8 @@ const nav = [
   { to: '/knowledge', label: 'Knowledge' },
   { to: '/workflows', label: 'Workflows' },
   { to: '/email', label: 'Email' },
-  { to: '/ai', label: 'AI Copilot' },
+  { to: '/audit', label: 'Audit' },
+  { to: '/ai', label: 'AI Command' },
 ];
 
 export default function Layout() {
