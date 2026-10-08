@@ -19,17 +19,20 @@ public class AiController {
     private final TicketRepository ticketRepository;
     private final ActivityRepository activityRepository;
     private final AiProviderService aiProviderService;
+    private final AiActionService aiActionService;
 
     public AiController(LeadRepository leadRepository,
                         OpportunityService opportunityService,
                         TicketRepository ticketRepository,
                         ActivityRepository activityRepository,
-                        AiProviderService aiProviderService) {
+                        AiProviderService aiProviderService,
+                        AiActionService aiActionService) {
         this.leadRepository = leadRepository;
         this.opportunityService = opportunityService;
         this.ticketRepository = ticketRepository;
         this.activityRepository = activityRepository;
         this.aiProviderService = aiProviderService;
+        this.aiActionService = aiActionService;
     }
 
     @PostMapping("/chat")
@@ -39,21 +42,26 @@ public class AiController {
 
         long totalLeads = leadRepository.countByOrganizationIdAndDeletedAtIsNull(orgId);
         long newLeads = leadRepository.countByOrganizationIdAndStatusAndDeletedAtIsNull(orgId, "NEW");
+        long qualified = leadRepository.countByOrganizationIdAndStatusAndDeletedAtIsNull(orgId, "QUALIFIED");
         Map<String, Object> pipe = opportunityService.pipelineSummary();
         long openTickets = ticketRepository.countByOrganizationIdAndStatusAndDeletedAtIsNull(orgId, "OPEN");
         long openTasks = activityRepository.countByOrganizationIdAndStatusAndDeletedAtIsNull(orgId, "OPEN");
 
         String contextBlock = String.format(
-                "Tenant CRM snapshot: leads total=%d, new=%d; open deals=%s, pipeline value=%s, weighted=%s; open tickets=%d; open tasks=%d.",
-                totalLeads, newLeads, pipe.get("openDeals"), pipe.get("openValue"), pipe.get("weightedValue"),
+                "Tenant CRM snapshot: leads total=%d, new=%d, qualified=%d; open deals=%s, pipeline value=%s, weighted=%s; open tickets=%d; open tasks=%d.",
+                totalLeads, newLeads, qualified,
+                pipe.get("openDeals"), pipe.get("openValue"), pipe.get("weightedValue"),
                 openTickets, openTasks);
 
         List<Map<String, Object>> suggestions = new ArrayList<>();
+        List<Map<String, Object>> proposedActions = aiActionService.propose(message);
         String reply;
         boolean demoMode = !aiProviderService.isLive();
 
         if (aiProviderService.isLive()) {
-            String system = "You are AetherCRM Copilot. Answer using the CRM snapshot only. Be concise. Never invent private data.\n\n" + contextBlock;
+            String system = "You are AetherCRM Copilot. Answer using the CRM snapshot. "
+                    + "You may suggest actions but never claim you already changed records unless the user executed an action.\n\n"
+                    + contextBlock;
             String live = aiProviderService.chat(system, message);
             if (live != null && !live.isBlank()) {
                 reply = live;
@@ -70,6 +78,7 @@ public class AiController {
         result.put("demoMode", demoMode);
         result.put("provider", aiProviderService.getProviderName());
         result.put("suggestions", suggestions);
+        result.put("proposedActions", proposedActions);
         result.put("userMessage", message);
         result.put("context", Map.of(
                 "leads", totalLeads,
@@ -81,26 +90,43 @@ public class AiController {
         return ResponseEntity.ok(result);
     }
 
+    @GetMapping("/actions")
+    public ResponseEntity<List<Map<String, Object>>> listActions() {
+        return ResponseEntity.ok(aiActionService.propose(""));
+    }
+
+    @PostMapping("/actions/execute")
+    public ResponseEntity<Map<String, Object>> execute(@RequestBody Map<String, Object> body) {
+        String actionType = body.get("actionType") != null ? body.get("actionType").toString() : null;
+        @SuppressWarnings("unchecked")
+        Map<String, Object> params = body.get("params") instanceof Map
+                ? (Map<String, Object>) body.get("params")
+                : Map.of();
+        return ResponseEntity.ok(aiActionService.execute(actionType, params));
+    }
+
     private String mockReply(String message, long totalLeads, long newLeads, Map<String, Object> pipe,
                              long openTickets, long openTasks, List<Map<String, Object>> suggestions) {
         String lower = message.toLowerCase();
-        if (lower.contains("lead")) {
-            return String.format("[Demo AI] You have %d leads total (%d NEW). Open the Leads page to filter and convert.", totalLeads, newLeads);
+        if (lower.contains("lead") || lower.contains("score")) {
+            suggestions.add(Map.of("label", "Rescore leads", "action", "SCORE_TOP_LEADS"));
+            return String.format(
+                    "You have %d leads (%d NEW). Use explainable scoring and AI Actions to rescore or create follow-ups.",
+                    totalLeads, newLeads);
         } else if (lower.contains("deal") || lower.contains("pipeline") || lower.contains("forecast")) {
-            return String.format("[Demo AI] Open pipeline: %s deals, value %s, weighted %s.",
+            return String.format("Open pipeline: %s deals · value %s · weighted %s (INR).",
                     pipe.get("openDeals"), pipe.get("openValue"), pipe.get("weightedValue"));
         } else if (lower.contains("ticket") || lower.contains("support")) {
-            return String.format("[Demo AI] There are %d open support tickets.", openTickets);
-        } else if (lower.contains("task") || lower.contains("activit")) {
-            suggestions.add(Map.of("type", "create_task", "requiresConfirmation", true));
-            return String.format("[Demo AI] You have %d open tasks/activities.", openTasks);
-        } else if (lower.contains("email") || lower.contains("draft") || lower.contains("follow-up")) {
-            suggestions.add(Map.of("type", "draft_email", "requiresConfirmation", true));
-            return "[Demo AI] Draft follow-up:\n\nSubject: Following up\n\nHi {{first_name}},\n\nI wanted to follow up on our recent discussion.\n\nBest regards";
-        } else if (lower.contains("dashboard") || lower.contains("summary") || lower.contains("report")) {
-            return String.format("[Demo AI] Snapshot — Leads: %d | Open deals: %s | Tickets: %d | Tasks: %d | Weighted: %s",
-                    totalLeads, pipe.get("openDeals"), openTickets, openTasks, pipe.get("weightedValue"));
+            return String.format("Support: %d open tickets. Prioritize by SLA on the Support page.", openTickets);
+        } else if (lower.contains("task") || lower.contains("follow")) {
+            suggestions.add(Map.of("label", "Create follow-up tasks", "action", "CREATE_FOLLOW_UP_TASKS"));
+            return String.format("You have %d open tasks. I can create follow-ups for NEW leads — confirm an AI Action below.", openTasks);
+        } else if (lower.contains("email")) {
+            return "I can log a draft outreach email against a NEW lead (SMTP or log-only). Use the Draft email action.";
         }
-        return "[Demo AI] Try: pipeline summary, open tickets, draft follow-up. Set AI_PROVIDER=openai and OPENAI_API_KEY for live LLM.";
+        return String.format(
+                "AetherCRM snapshot — leads: %d (%d new), open deals: %s, open tickets: %d, open tasks: %d.\n"
+                        + "Try: score leads, create follow-up tasks, or pipeline summary.",
+                totalLeads, newLeads, pipe.get("openDeals"), openTickets, openTasks);
     }
 }
