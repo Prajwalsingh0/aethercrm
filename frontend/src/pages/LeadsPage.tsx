@@ -1,4 +1,4 @@
-import { FormEvent, useEffect, useState } from 'react';
+import { type FormEvent, useEffect, useState } from 'react';
 import { api } from '../api/client';
 
 type Lead = { id: string; fullName: string; email?: string; company?: string; status: string; score: number; source?: string };

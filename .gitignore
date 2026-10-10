@@ -1,6 +1,8 @@
 # Backend
 backend/target/
 backend/data/
+backend/bin/
+bin/
 backend/*.db
 backend/.mvn/
 backend/*.iml

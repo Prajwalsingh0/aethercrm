@@ -18,7 +18,7 @@ public interface LeadRepository extends JpaRepository<Lead, UUID> {
            "AND (:q IS NULL OR LOWER(l.firstName) LIKE LOWER(CONCAT('%',:q,'%')) " +
            "OR LOWER(l.lastName) LIKE LOWER(CONCAT('%',:q,'%')) " +
            "OR LOWER(l.email) LIKE LOWER(CONCAT('%',:q,'%')) " +
-           "OR LOWER(l.company) LIKE LOWER(CONCAT('%',:q,'%'))")
+           "OR LOWER(l.company) LIKE LOWER(CONCAT('%',:q,'%')))")
     Page<Lead> search(@Param("orgId") UUID orgId,
                       @Param("status") String status,
                       @Param("ownerId") UUID ownerId,

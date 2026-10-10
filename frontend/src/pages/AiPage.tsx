@@ -1,4 +1,4 @@
-import { FormEvent, useEffect, useState } from 'react';
+import { type FormEvent, useEffect, useState } from 'react';
 import { api } from '../api/client';
 
 type Msg = { role: 'user' | 'assistant'; content: string; demoMode?: boolean };

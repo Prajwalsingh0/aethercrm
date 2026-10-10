@@ -1,4 +1,4 @@
-import { FormEvent, useEffect, useState } from 'react';
+import { type FormEvent, useEffect, useState } from 'react';
 import { api } from '../api/client';
 
 type Product = { id: string; name: string; sku?: string; unitPrice: number; currency?: string; isActive: boolean; category?: string };

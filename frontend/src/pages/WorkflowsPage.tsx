@@ -1,4 +1,4 @@
-import { FormEvent, useEffect, useState } from 'react';
+import { type FormEvent, useEffect, useState } from 'react';
 import { api } from '../api/client';
 
 type Workflow = { id: string; name: string; description?: string; isActive: boolean; triggerType: string };

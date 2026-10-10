@@ -1,6 +1,6 @@
-import { FormEvent, useState } from 'react';
+import { type FormEvent, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { api, storeAuth, AuthTokens } from '../api/client';
+import { api, storeAuth, type AuthTokens } from '../api/client';
 
 export default function RegisterPage() {
   const navigate = useNavigate();

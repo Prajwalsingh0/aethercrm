@@ -1,4 +1,4 @@
-import { FormEvent, useEffect, useState } from 'react';
+import { type FormEvent, useEffect, useState } from 'react';
 import { api } from '../api/client';
 
 type Account = { id: string; name: string; industry?: string; email?: string; status: string };
